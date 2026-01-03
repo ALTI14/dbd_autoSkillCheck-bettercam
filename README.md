@@ -20,28 +20,35 @@ This tool is designed to demonstrate how AI can improve gameplay performance and
 * [DBD Auto Skill Check](#dbd-auto-skill-check)
 * [Features](#features)
 * [Execution Instructions](#execution-instructions)
-    * [Get the code](#get-the-code)
-        * [Python embedded app (RECOMMENDED)](#python-embedded-app-recommended)
-        * [Build from source](#build-from-source)
-        * [Windows compiled app](#windows-compiled-app)
-    * [Auto skill-check Web UI](#auto-skill-check-web-ui)
+  * [Get the code](#get-the-code)
+    * [Python embedded app](#python-embedded-app)
+    * [Build from source](#build-from-source)
+  * [Auto skill-check Web UI](#auto-skill-check-web-ui)
 * [Project details](#project-details)
-    * [What is a skill check](#what-is-a-skill-check)
-    * [Dataset](#dataset)
-    * [Architecture](#architecture)
-    * [Training](#training)
-    * [Inference](#inference)
-    * [Results](#results)
+  * [What is a skill check](#what-is-a-skill-check)
+  * [Dataset](#dataset)
+  * [Architecture](#architecture)
+  * [Training](#training)
+  * [Inference](#inference)
+  * [Results](#results)
 * [FAQ](#faq)
 * [Acknowledgments](#acknowledgments)
 <!-- TOC -->
 
 # Features
-- Real-time detection of skill checks (60fps)
+- Real-time detection of skill checks (120fps)
 - High accuracy of the AI model in recognizing **all types of skill checks (with a 98.7% precision, see details of [Results](#results))**
 - Automatic triggering of great skill checks through auto-pressing the space bar
 - A webUI to run the AI model
 - A GPU mode and a slow-CPU-usage mode to reduce CPU overhead
+
+What's in the **beta V4 release** (only available in the discord server for now):
+- A brand-new **AI model trained on updated data**, offering improved accuracy and supporting perks: 1, 2, 3, 4 / Decisive Strike / Oppression. Add-on: Brand New Part
+- A lighter CPU-optimized version of the AI model (1.5 MB) using 8-bit integer quantization
+- A GPU-optimized version of the AI model (6 MB) using CUDA or cuML
+- A new user interface 
+- A simpler, more accessible way to enable GPU mode
+- Some options to customize the AI settings, especially helpful for older hardware
 
 
 # Execution Instructions
@@ -51,10 +58,10 @@ This tool is designed to demonstrate how AI can improve gameplay performance and
 We provide a simple web interface to configure and run the AI model. When running, it will monitor a small portion of the selected screen and automatically hit the space bar when a great skill check is detected. The screen analysis is done in real time locally on your computer.
 - [From the python embedded app](#python-embedded-app-recommended): Recommended and easiest way to run the AI model without installing anything.
 - [From source](#build-from-source): Recommended if you want to customize the code or run it on GPU.
-- [From the windows compiled app](#windows-compiled-app): A compiled package of the app. Just download & run the Windows `.exe`. Will be deprecated in the future for security reasons.
+- Go to the discord server to access to the new V4 release! It will be publicly released in this repo after a beta period in the discord server.
 
 
-### Python embedded app (RECOMMENDED)
+### Python embedded app
 
 This is the recommended method to run the AI model. You don't need to install anything, and don't need any Python knowledge.
 
@@ -72,16 +79,6 @@ Use this method if you have some experience with Python and if you want to custo
 2) Install the minimal necessary libraries using the command: `pip install numpy mss onnxruntime pyautogui IPython pillow gradio opencv-python`
 3) git clone the repo or download the source code (zip)
 4) Run `python app.py` to start the AI model web UI
-5) Follow the [next instructions](#auto-skill-check-web-ui)
-
-### Windows compiled app
-
-_Warning_: Some players reported that the compiled version `.exe` can cause EAC suspicious / ban, even in private games. That's why I recommend the two other execution methods, which are much safer to use. More details are available on the [Discord server](#acknowledgments).
-
-1) Go to the [releases page](https://github.com/Manuteaa/dbd_autoSkillCheck/releases)
-2) Download `standalone.zip` in an old release
-3) Unzip the file
-4) Run `app.exe` to start the AI model web UI
 5) Follow the [next instructions](#auto-skill-check-web-ui)
 
 
@@ -109,7 +106,7 @@ On the right of the web UI, we display :
 - The last hit skill check frame : last frame the AI model triggered the SPACE bar. **This may not be the actual hit frame (as registered by the game) because of game latency (such as ping). The AI model anticipates the latency, and hits the space bar a little bit before the cursor reaches the great area, that's why the displayed frame will always be few frames before actual game hit frame**
 - Skill check recognition : set of probabilities for the frame displayed above
 
-**Both the game AND the AI model FPS must run at 60fps (or more) in order to hit correctly the great skill checks.**
+**Both the game AND the AI model FPS must run at a minimum of 60fps in order to hit correctly the great skill checks.**
 
 # Project details
 
@@ -195,7 +192,7 @@ We test our model using a testing dataset of ~2000 images:
 
 
 During our laptop testing, we observed rapid inference times of approximately 10ms per frame using MobileNet V3 Small.
-When combined with our screen monitoring script, we achieved a consistent 60fps detection rate, which is enough for real-time detection capabilities.
+When combined with our screen monitoring script, we achieved a consistent 120fps detection rate, which is enough for real-time detection capabilities.
 
 In conclusion, our model achieves high accuracy thanks to the high-quality dataset with effective data augmentation techniques, and architectural choices.
 **The RUN script successfully hits the great skill checks with high confidence.**
@@ -220,21 +217,20 @@ In conclusion, our model achieves high accuracy thanks to the high-quality datas
 - Uninstall `onnxruntime` then install `onnxruntime-directml`
 - Select "GPU" in the Auto skill check webUI, click "RUN"
 
-**Why do I hit good skill checks instead of great ? Be sure :**
-- Your game FPS >= 60
-- The AI model FPS >= 60
-- Your ping is not too high (<= 60 should be fine)
+**Why do I hit good skill checks instead of great ?**
+- Best performance is achieved when both the game and the AI model run around 120fps (or more).
+- Check if your ping is not too high
 - Disable all your game filters/reshade, disable vsync and disable FSR
 - In the `Features options` of the WebUI, decrease (closer to 0) the `Ante-frontier hit delay` value
 
-**I have lower values than 60 FPS for the AI model, what can I do ?**
-- In the `Features options` of the WebUI, increase the `CPU workload` option
+**I want to increase the AI model FPS, what can I do ?**
+- Use performance mode on your windows battery settings
+- Run the app with a higher priority in the task manager
+- Close all unnecessary applications running in the background and decrease the game graphics settings
+- In the `Features options` of the WebUI, increase the `CPU workload`. Note that you should adapt the value depending on your hardware, because highest values can lower performance on low-end CPU.
 - Set both your monitor & game resolution to 1920x1080 at 100% scale
 - Increase all your monitors refresh rate (120Hz for example)
-- Use standard game settings (resolution 1920x1080 with 100% scale)
-- Use fullscreen game mode (not borderless window)
 - Switch device to gpu
-- Run the script in administrator mode or with a higher priority in the task manager
 
 **Why does the AI model hit the skill check too early and fail ?**
 - In the `Features options` of the WebUI, increase the `Ante-frontier hit delay` value

@@ -53,8 +53,8 @@ class AI_model:
         self.use_gpu = use_gpu
         self.nb_cpu_threads = nb_cpu_threads
 
-        self.perf_frame_count = 0
-        self.perf_accumulated_time = 0
+       # self.perf_frame_count = 0
+       # self.perf_accumulated_time = 0
 
         # Screen monitoring
         self.monitor = None
